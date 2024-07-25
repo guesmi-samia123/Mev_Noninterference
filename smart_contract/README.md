@@ -10,7 +10,7 @@ open the folder smart_contract : cd smart_contract and execute the following com
 
 1- npm install 
 2- npm init -y
-3- install Hardhat : npm install --save-dev hardhat and during the installation select "Create a JavaScript project" 
+3- install Hardhat : "npm install --save-dev hardhat" and then "npm hardhat init " during the installation select "Create a JavaScript project" 
 
 to compile smart contract use the command : npx hardhat compile 
 

@@ -26,17 +26,16 @@ describe("test",  function () {
     // THE VALUE ON MICRO-USDC
     const micro_usdc =await usdc.balanceOf(usdcOwner);
     //THE VALUE ON USDC
-    const usdcValue =(micro_usdc.toString())/10**6;
+    const usdcValue =(micro_usdc.toString())/10**18;
     //CHECK USDC ATTRIBUTES
     console.log("USDC address ", usdcAddress);
     console.log("USDC owner address ", usdcOwner);
+    console.log("USDC owner balance ", ((await usdc.balanceOf(usdcOwner)).toString())/ 10**18, "ether");
     console.log("USDC decimal ",   await usdc.decimals());
-    console.log("USDC total supply on micro_usdc",   await usdc.totalSupply(), "micro_usdc");
-    console.log("USDC total supply on usdc",   ((await usdc.totalSupply()).toString())/10**6, "usdc");
-    console.log("USDC owner balance  on micro_usdc", micro_usdc , "micro_usdc");
+    console.log("USDC total supply ",   await usdc.totalSupply(), "micro_usdct");
+    console.log("USDC balance owner on small unit", micro_usdc , "micro_usdc");
     console.log("USDC owner balance on usdc ",usdcValue , "usdc");
-    console.log("-------------------------------------- AMM  DEPLOYMENT -------------------------------------------------");
-    
+
     //AMM DEPLOYMENT
     const AMM = await ethers.deployContract("AMM", [usdcAddress]);
     await AMM.waitForDeployment();
@@ -44,45 +43,42 @@ describe("test",  function () {
     const tokenAmm_Address = await AMM.get_TokenAddress();
     console.log("AMM address ", AMM_Address);
     console.log("tokenAMM address ", tokenAmm_Address);
-    console.log("-------------------------------------- ADD LIQUIDITY -----------------------------------------------------");
+
     //CHECK THE BALANCE BEFORE LIQUIDITY 
     console.log("BALANCE_ETHER_AMM = ",   await AMM.getEtherBalance(AMM_Address));
     console.log("BALANCE_ERC20_AMM= ",    await AMM.getBalanceOfERC20(AMM_Address) );
-  
+
     //APPROVE
-     await usdc.connect(user1).approve(AMM,600* 10**6);
-     const allawanceValue =((await usdc.allowance(user1.getAddress(),AMM_Address)).toString())/10**6;
+     await usdc.connect(user1).approve(AMM,600*10**6);
+     const allawanceValue =await usdc.allowance(user1.getAddress(),AMM_Address);
      console.log("allawance Value ",allawanceValue);
 
+ 
    //***********ADD LIQUIDITY *****************************
      const etherAmount = ethers.parseUnits("600");
-     const usdcAmount=ethers.parseUnits("600", 6)
-     const tx=await AMM.connect(user1).addLiquidity(usdcAmount, {value: etherAmount} );
-   
+     //const usdcAmount=ethers.parseUnits("600")
+     const tx=await AMM.connect(user1).addLiquidity(600*10**6, {value: etherAmount} );
+    
     
     //CHECK THE BALANCE AFTER LIQUIDITY 
     console.log("BALANCE_ETHER_AMM = ",   ((await AMM.getEtherBalance(AMM_Address)).toString())/10**18);
     console.log("BALANCE_ERC20_AMM= ",    ((await AMM.getBalanceOfERC20(AMM_Address)).toString())/10**6 );
 
-  console.log("-------------------------------------- GET TOKENS ----------------------------------------------------------");
+/*
+  //******************* get Tokens ******************* 
   console.log("Tokens of AMM are : ",   await AMM.getTokens());
 
-  console.log("-------------------------------------- GET RATES -----------------------------------------------------------");  
-  console.log("rate ether", parseFloat((await AMM.getRate("ether")).toString())* 0.000000000000000001);
-  console.log("rate usdc", parseFloat((await AMM.getRate("usdc")).toString())* 0.000001);
- 
+/******************* getRate ***********************
+console.log("rate ether", parseFloat((await AMM.getRate("ether")).toString())* 0.000000000000000001);
+console.log("rate usdc", parseFloat((await AMM.getRate("usdc")).toString())* 0.000001);
 
-console.log("-------------------------------------- GET RATES -------------------------------------------------");  
+
+//SWAP
 console.log("msg.sender balance before the swap token= ",   ( (await AMM.getBalanceOfERC20(user1.getAddress())).toString())/10**6 );
 console.log("msg.sender balance before the swap ether= ",   ((await AMM.getEtherBalance(user1.getAddress())).toString())/10**18);
 
 const etherAmount2 = ethers.parseUnits("300");
-const amountusdc=ethers.parseUnits("300",6);
-await usdc.connect(user1).approve(AMM, amountusdc);
-await AMM.swap(300); // 100ms
-console.log(await AMM.amount());
-//console.log("Transaction ", tx);
-
+await AMM.swap(0,{value:etherAmount2} ); // 100ms
 
 console.log("k",await AMM.k());
 console.log("initialbalancEether", await AMM.initialbalancEether());
@@ -90,10 +86,12 @@ console.log("initialbalanceToken", await AMM.initialbalanceToken());
 console.log("_ExpBalanceEther",await AMM._ExpBalanceEther());
 console.log("_ExpBalanceToken", await AMM._ExpBalanceToken());
 console.log("_valueToTransfer",await AMM._valueToTransfer());
+console.log("amountusdcsend",await AMM.amountusdcsend());
 //check balance after swap
 console.log("BALANCE_ETHER_AMM = ",   ((await AMM.getEtherBalance(AMM_Address)).toString())/10**18);
 console.log("BALANCE_ERC20_AMM= ",   ( (await AMM.getBalanceOfERC20(AMM_Address)).toString())/10**6 );
 console.log("msg.sender balance ether  afeter the swap=  ",   ((await AMM.getEtherBalance(user1.getAddress())).toString())/10**18);
 console.log("msg.sender balance usdc afeter the swap= ",   ( (await AMM.getBalanceOfERC20(user1.getAddress())).toString())/10**6 );
+*/
 }); 
 });

@@ -1,9 +1,9 @@
 //SPDX-License-Identifier: UNLICENSED
-//pragma experimental SMTChecker;
+pragma experimental SMTChecker;
 pragma solidity >=0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "hardhat/console.sol";
+
 contract AMM {
 /*********** VARIABLES *************** */
     ERC20   private _Token;
@@ -14,8 +14,7 @@ contract AMM {
     uint256 public initialbalanceToken;
     uint256 public k;
     uint256 public amount_valueToTransfer;
-    uint256 public amountusdcsend;
-
+   
 /*********** EVENTS *************** */
     event Transfer(address indexed from, address indexed to, uint256 value);
 
@@ -94,33 +93,34 @@ contract AMM {
         return rate;
     }
            
-   function get_valueEtherToTransfer(uint256 amount)public returns(uint256){
+   function get_valueTokenToTransfer(uint256 amount)private returns(uint256){
         k = initialbalancEether * initialbalanceToken;
        _ExpBalanceEther = initialbalancEether + (amount/10**18) ;
+       require(_ExpBalanceEther!=0, "invalid decvision by 0");
        _ExpBalanceToken = k  / _ExpBalanceEther;
        _valueToTransfer = initialbalanceToken  - _ExpBalanceToken;
        return _valueToTransfer;
     }    
 
-    function get_valueTokenToTransfer(uint256 amount)public returns(uint256){
+    function get_valueEtherToTransfer(uint256 amount)private returns(uint256){
         k = initialbalancEether * initialbalanceToken;
         _ExpBalanceToken=initialbalanceToken + amount;
+        require(_ExpBalanceToken!=0, "invalid decvision by 0");
         _ExpBalanceEther = k  / _ExpBalanceToken;
         _valueToTransfer = initialbalancEether  - _ExpBalanceEther;
        return _valueToTransfer;
     }    
-   
-   function swap(uint256 amount)  public payable {
-        if (amount==0){
-            amount_valueToTransfer= get_valueEtherToTransfer(msg.value);
-            require ((_Token.balanceOf(address(this)) )>=amount_valueToTransfer, "insuficient balance of USDC");
+   function swap(uint256 _amount)  public payable {
+        if (_amount==0){
+            amount_valueToTransfer= get_valueTokenToTransfer(msg.value);
+            require ((_Token.balanceOf(address(this)) )>=amount_valueToTransfer*10**6, "insuficient balance of USDC");
             bool transfer = _Token.transfer(msg.sender, amount_valueToTransfer*10**6 );
+            require (transfer==true, "faild transdfer USDC");
         }
         else 
-        {
-            amountusdcsend=amount_valueToTransfer*(10**18);
-            amount_valueToTransfer= get_valueTokenToTransfer(amount);
-            amountusdcsend=amount_valueToTransfer*(10**18);
+        {   amount = _amount;
+            amount_valueToTransfer= get_valueEtherToTransfer(_amount);
+            TokensTransferFrom(msg.sender, address(this), _amount*10**6);
             require(address(this).balance>=amount_valueToTransfer, "insuficient balance of USDC");
             (bool success, ) = payable(msg.sender).call{value: amount_valueToTransfer*(10**18)}("");
             require(success, "Failed to send Ether");

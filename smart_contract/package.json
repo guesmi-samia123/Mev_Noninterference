@@ -11,11 +11,13 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-ignition-ethers": "^0.15.1",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.8",
     "hardhat": "^2.22.6"
   },
   "dependencies": {
     "@chainlink/contracts": "^1.1.1",
     "@openzeppelin/contracts": "^5.0.2",
-    "ethers": "^6.12.0"
+    "ethers": "^6.12.0",
+    "solc": "^0.8.26"
   }
 }

@@ -15,3 +15,4 @@ contract USDC is ERC20 {
         return 6;
     }
    }
+ 
